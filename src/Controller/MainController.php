@@ -33,6 +33,11 @@ class MainController extends AbstractController
 
 
             $data['color'] = '#' . dechex($rgb);
+            $timeOn = new \DateTime($dataArr['timeOn']);
+            $data['timeOn'] = $timeOn;
+            $timeOff = new \DateTime($dataArr['timeOff']);
+            $data['timeOff'] = $timeOff;
+            $data['timeOfGradient'] = $dataArr['timeOfGradient'];
         }
 
         $form = $this->createFormBuilder()
