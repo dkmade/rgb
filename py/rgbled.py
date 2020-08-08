@@ -43,9 +43,9 @@ print data['rgb1']['r']
 print data['rgb1']['g']
 print data['rgb1']['b']
 
-RED.ChangeDutyCycle(data['r'])
-GREEN.ChangeDutyCycle(data['g'])
-BLUE.ChangeDutyCycle(data['b'])
+RED.ChangeDutyCycle(data['rgb1']['r'])
+GREEN.ChangeDutyCycle(data['rgb1']['g'])
+BLUE.ChangeDutyCycle(data['rgb1']['b'])
 
 
 
