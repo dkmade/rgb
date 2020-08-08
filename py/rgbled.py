@@ -38,9 +38,9 @@ BLUE.start(0)
 with open("data.json", "r") as read_file:
     data = json.load(read_file)
 
-print data['r']
-print data['g']
-print data['b']
+print data['rgb1']['r']
+print data['rgb1']['g']
+print data['rgb1']['b']
 
 RED.ChangeDutyCycle(data['r'])
 GREEN.ChangeDutyCycle(data['g'])
