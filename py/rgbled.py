@@ -92,7 +92,7 @@ try:
                             GREEN.ChangeDutyCycle(data['rgb1']['g'])
                             BLUE.ChangeDutyCycle(data['rgb1']['b'])
                         elif(datetime.datetime.now() > datetime_off_start and datetime.datetime.now() < datetime_off_end):
-                            delta_now = datetime.datetime.now() - datetime_on_start
+                            delta_now = datetime.datetime.now() - datetime_off_start
                             seconds = delta_now.total_seconds()
                             koef = 1 - seconds/delta_all
                             RED.ChangeDutyCycle(data['rgb1']['r']*koef)
