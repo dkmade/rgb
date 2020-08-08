@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -35,6 +36,8 @@ class MainController extends AbstractController
 
         $form = $this->createFormBuilder()
             ->add('color', ColorType::class)
+            ->add('timeOn', TimeType::class, ['label' => 'Turn on'])
+            ->add('timeOff', TimeType::class, ['label' => 'Turn off'])
             ->add('submit', SubmitType::class, ['label' => 'Сохранить'])
             ->setData($data)
             ->getForm()
