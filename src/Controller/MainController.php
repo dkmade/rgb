@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ColorType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TimeType;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,11 +25,11 @@ class MainController extends AbstractController
 
             $json = file_get_contents($fileName);
             $dataArr = json_decode($json, true);
-            $r = round($dataArr['r'] * 2.55);
-            $g = round($dataArr['g'] * 2.55);
-            $b = round($dataArr['b'] * 2.55);
+            $r = round($dataArr['rgb1']['r'] * 2.55);
+            $g = round($dataArr['rgb1']['g'] * 2.55);
+            $b = round($dataArr['rgb1']['b'] * 2.55);
 
-            $rgb = $r*256*256 + $g*256 + $b;
+            $rgb = $r * 256 * 256 + $g * 256 + $b;
 
 
             $data['color'] = '#' . dechex($rgb);
@@ -38,10 +39,10 @@ class MainController extends AbstractController
             ->add('color', ColorType::class)
             ->add('timeOn', TimeType::class, ['label' => 'Turn on'])
             ->add('timeOff', TimeType::class, ['label' => 'Turn off'])
+            ->add('timeOfGradient', IntegerType::class, ['label' => 'Время плавности (минут)'])
             ->add('submit', SubmitType::class, ['label' => 'Сохранить'])
             ->setData($data)
-            ->getForm()
-        ;
+            ->getForm();
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
@@ -53,9 +54,16 @@ class MainController extends AbstractController
             $g = (int)($g / 2.55);
             $b = (int)($b / 2.55);
             $arr = [
-                'r' => $r,
-                'g' => $g,
-                'b' => $b
+                'rgb1' =>
+                    [
+                        'r' => $r,
+                        'g' => $g,
+                        'b' => $b
+                    ],
+                'timeOn' => $data['timeOn']->format("H:i"),
+                'timeOff' => $data['timeOff']->format("H:i"),
+                'timeOfGradient' => $data['timeOfGradient'],
+
             ];
             $json = json_encode($arr);
             $fp = fopen($fileName, "w");
