@@ -19,10 +19,17 @@ green = 20
 red = 21
 blue = 22
 
+green2 = 13
+red2 = 19
+blue2 = 26
+
 #defining the pins as output
 GPIO.setup(red, GPIO.OUT) 
 GPIO.setup(green, GPIO.OUT)
 GPIO.setup(blue, GPIO.OUT)
+GPIO.setup(red2, GPIO.OUT)
+GPIO.setup(green2, GPIO.OUT)
+GPIO.setup(blue2, GPIO.OUT)
 
 #choosing a frequency for pwm
 Freq = 100
@@ -31,10 +38,16 @@ Freq = 100
 RED = GPIO.PWM(red, Freq)  
 GREEN = GPIO.PWM(green, Freq)
 BLUE = GPIO.PWM(blue, Freq)
+RED2 = GPIO.PWM(red2, Freq)
+GREEN2 = GPIO.PWM(green2, Freq)
+BLUE2 = GPIO.PWM(blue2, Freq)
 
 RED.start(0)
 GREEN.start(0)
 BLUE.start(0)
+RED2.start(0)
+GREEN2.start(0)
+BLUE2.start(0)
 
 with open("data.json", "r") as read_file:
     data = json.load(read_file)
@@ -46,6 +59,14 @@ print data['rgb1']['b']
 RED.ChangeDutyCycle(data['rgb1']['r'])
 GREEN.ChangeDutyCycle(data['rgb1']['g'])
 BLUE.ChangeDutyCycle(data['rgb1']['b'])
+
+print data['rgb2']['r']
+print data['rgb2']['g']
+print data['rgb2']['b']
+
+RED2.ChangeDutyCycle(data['rgb2']['r'])
+GREEN2.ChangeDutyCycle(data['rgb2']['g'])
+BLUE2.ChangeDutyCycle(data['rgb2']['b'])
 
 
 
@@ -64,10 +85,6 @@ try:
                 with file:
                     with file:
                         data = json.load(file)
-
-#                         print data['r']
-#                         print data['g']
-#                         print data['b']
 
 
                         datetime_on_start = datetime.datetime.strptime(datetime.datetime.now().strftime('%Y-%m-%d ') + data['timeOn'] + ':00', '%Y-%m-%d %H:%M:%S')
@@ -100,9 +117,39 @@ try:
                             BLUE.ChangeDutyCycle(data['rgb1']['b']*koef)
 
 
-#                         RED.ChangeDutyCycle(data['rgb1']['r'])
-#                         GREEN.ChangeDutyCycle(data['rgb1']['g'])
-#                         BLUE.ChangeDutyCycle(data['rgb1']['b'])
+
+
+                        datetime_on_start = datetime.datetime.strptime(datetime.datetime.now().strftime('%Y-%m-%d ') + data['timeOn2'] + ':00', '%Y-%m-%d %H:%M:%S')
+                        datetime_on_end   = datetime_on_start + datetime.timedelta(minutes = data['timeOfGradient2'])
+                        datetime_off_end   = datetime.datetime.strptime(datetime.datetime.now().strftime('%Y-%m-%d ') + data['timeOff2'] + ':00', '%Y-%m-%d %H:%M:%S')
+                        datetime_off_start   = datetime_off_end - datetime.timedelta(minutes = data['timeOfGradient2'])
+                        delta_all = data['timeOfGradient2'] * 60
+
+                        if (datetime.datetime.now() < datetime_on_start or datetime.datetime.now() > datetime_off_end):
+                            RED2.ChangeDutyCycle(0)
+                            GREEN2.ChangeDutyCycle(0)
+                            BLUE2.ChangeDutyCycle(0)
+                        elif(datetime.datetime.now() > datetime_on_start and datetime.datetime.now() < datetime_on_end):
+                            delta_now = datetime.datetime.now() - datetime_on_start
+                            seconds = delta_now.total_seconds()
+                            koef = seconds/delta_all
+                            RED2.ChangeDutyCycle(data['rgb2']['r']*koef)
+                            GREEN2.ChangeDutyCycle(data['rgb2']['g']*koef)
+                            BLUE2.ChangeDutyCycle(data['rgb2']['b']*koef)
+                        elif(datetime.datetime.now() > datetime_on_end and datetime.datetime.now() < datetime_off_start):
+                            RED2.ChangeDutyCycle(data['rgb2']['r'])
+                            GREEN2.ChangeDutyCycle(data['rgb2']['g'])
+                            BLUE2.ChangeDutyCycle(data['rgb2']['b'])
+                        elif(datetime.datetime.now() > datetime_off_start and datetime.datetime.now() < datetime_off_end):
+                            delta_now = datetime.datetime.now() - datetime_on_start
+                            seconds = delta_now.total_seconds()
+                            koef = 1 - seconds/delta_all
+                            RED2.ChangeDutyCycle(data['rgb2']['r']*koef)
+                            GREEN2.ChangeDutyCycle(data['rgb2']['g']*koef)
+                            BLUE2.ChangeDutyCycle(data['rgb2']['b']*koef)
+
+
+
                         time.sleep(0.1)
 
 except KeyboardInterrupt:

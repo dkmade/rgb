@@ -12,6 +12,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MainController extends AbstractController
 {
+
+    private function toColor($n)
+    {
+        return("#".substr("000000".dechex($n),-6));
+    }
+
     /**
      * @Route("/", name="home_page")
      */
@@ -31,13 +37,26 @@ class MainController extends AbstractController
 
             $rgb = $r * 256 * 256 + $g * 256 + $b;
 
+            $r = round($dataArr['rgb2']['r'] * 2.55);
+            $g = round($dataArr['rgb2']['g'] * 2.55);
+            $b = round($dataArr['rgb2']['b'] * 2.55);
 
-            $data['color'] = '#' . dechex($rgb);
+            $rgb2 = $r * 256 * 256 + $g * 256 + $b;
+
+
+            $data['color'] = $this->toColor($rgb);
+            $data['color2'] = $this->toColor($rgb2);
+//            dump($data);
             $timeOn = new \DateTime($dataArr['timeOn']);
             $data['timeOn'] = $timeOn;
+            $timeOn = new \DateTime($dataArr['timeOn2']);
+            $data['timeOn2'] = $timeOn;
             $timeOff = new \DateTime($dataArr['timeOff']);
             $data['timeOff'] = $timeOff;
+            $timeOff = new \DateTime($dataArr['timeOff2']);
+            $data['timeOff2'] = $timeOff;
             $data['timeOfGradient'] = $dataArr['timeOfGradient'];
+            $data['timeOfGradient2'] = $dataArr['timeOfGradient2'];
         }
 
         $form = $this->createFormBuilder()
@@ -45,6 +64,10 @@ class MainController extends AbstractController
             ->add('timeOn', TimeType::class, ['label' => 'Turn on'])
             ->add('timeOff', TimeType::class, ['label' => 'Turn off'])
             ->add('timeOfGradient', IntegerType::class, ['label' => 'Время плавности (минут)'])
+            ->add('color2', ColorType::class)
+            ->add('timeOn2', TimeType::class, ['label' => 'Turn on'])
+            ->add('timeOff2', TimeType::class, ['label' => 'Turn off'])
+            ->add('timeOfGradient2', IntegerType::class, ['label' => 'Время плавности (минут)'])
             ->add('submit', SubmitType::class, ['label' => 'Сохранить'])
             ->setData($data)
             ->getForm();
@@ -70,6 +93,26 @@ class MainController extends AbstractController
                 'timeOfGradient' => $data['timeOfGradient'],
 
             ];
+
+            list($r, $g, $b) = sscanf($data['color2'], "#%02x%02x%02x");
+            $r = (int)($r / 2.55);
+            $g = (int)($g / 2.55);
+            $b = (int)($b / 2.55);
+            $arr = array_merge(
+                $arr,
+                [
+                    'rgb2' =>
+                        [
+                            'r' => $r,
+                            'g' => $g,
+                            'b' => $b
+                        ],
+                    'timeOn2' => $data['timeOn2']->format("H:i"),
+                    'timeOff2' => $data['timeOff2']->format("H:i"),
+                    'timeOfGradient2' => $data['timeOfGradient2'],
+
+                ]
+            );
             $json = json_encode($arr);
             $fp = fopen($fileName, "w");
             fwrite($fp, $json);
